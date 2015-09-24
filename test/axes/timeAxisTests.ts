@@ -129,6 +129,7 @@ describe("TimeAxis", () => {
     assert.isTrue(lastTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
     svg.remove();
   });
+
   describe("tick labels and tick marks locations", () => {
     it("tick labels do not overlap with tick marks", () => {
       let svg = TestMethods.generateSVG(400, 100);
