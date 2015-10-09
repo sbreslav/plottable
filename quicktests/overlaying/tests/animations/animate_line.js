@@ -8,7 +8,6 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  console.log("about to do moment stuff");
   moment.locale("ja");
   var doAnimate = true;
   var xScale = new Plottable.Scales.Time();

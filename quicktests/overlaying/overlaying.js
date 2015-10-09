@@ -309,9 +309,11 @@ function loadPlottableBranches(category, branchList){
 
         $.getScript(listOfUrl[1], function(innerData, innerTestStatus){ //load second
           if(innerTestStatus === "success"){
-            plottableBranches[branchName2] = $.extend(true, {}, Plottable);
-            Plottable = null;
-            filterQuickTests(category, branchList);
+            $.getScript("http://rawgit.com/palantir/plottable-moment/master/plottable-moment.js", function(data, textStatus) {
+              plottableBranches[branchName2] =  $.extend(true, {}, Plottable);
+              Plottable = null;
+              filterQuickTests(category, branchList);
+            });
           }
         });
       });
