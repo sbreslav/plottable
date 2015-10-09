@@ -299,6 +299,8 @@ function loadPlottableBranches(category, branchList){
       listOfUrl.push("/plottable.js"); //load local version
     }
   });
+  listOfUrl.push("http://rawgit.com/palantir/plottable-moment/master/plottable-moment.js");
+
 
   $.getScript(listOfUrl[0], function(data, textStatus) {
     if(textStatus === "success"){
