@@ -299,21 +299,23 @@ function loadPlottableBranches(category, branchList){
       listOfUrl.push("/plottable.js"); //load local version
     }
   });
-  listOfUrl.push("http://rawgit.com/palantir/plottable-moment/master/plottable-moment.js");
 
 
   $.getScript(listOfUrl[0], function(data, textStatus) {
     if(textStatus === "success"){
-      plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
-      Plottable = null;
+      $.getScript("http://rawgit.com/palantir/plottable-moment/master/plottable-moment.js", function(data, textStatus) {
+        plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
+        Plottable = null;
 
-      $.getScript(listOfUrl[1], function(innerData, innerTestStatus){ //load second
-        if(innerTestStatus === "success"){
-          plottableBranches[branchName2] = $.extend(true, {}, Plottable);
-          Plottable = null;
-          filterQuickTests(category, branchList);
-        }
+        $.getScript(listOfUrl[1], function(innerData, innerTestStatus){ //load second
+          if(innerTestStatus === "success"){
+            plottableBranches[branchName2] = $.extend(true, {}, Plottable);
+            Plottable = null;
+            filterQuickTests(category, branchList);
+          }
+        });
       });
+
     } else if (textStatus === "error"){
       throw new Error("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
     }
