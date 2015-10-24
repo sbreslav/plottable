@@ -374,6 +374,10 @@ module Plottable.Axes {
       return tickPos;
     }
 
+    private _formatTickLabes(labelPos: Date[]) {
+      return labelPos;
+    }
+
     private _renderTierLabels(container: d3.Selection<void>, config: TimeAxisTierConfiguration, index: number) {
       let tickPos = this._getTickValuesForConfiguration(config);
       let labelPos: Date[] = [];
@@ -387,6 +391,7 @@ module Plottable.Axes {
       } else {
         labelPos = tickPos;
       }
+      labelPos = this._formatTickLabes(labelPos);
 
       let tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
       let tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
