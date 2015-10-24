@@ -4222,6 +4222,12 @@ var Plottable;
                 }
                 return tickPos;
             };
+            Time.prototype.formatTickLabels = function (labelPos) {
+                return labelPos;
+            };
+            Time.prototype.setTimeZone = function (timezone) {
+                Plottable.Utils.Window.warn("timezone is not supported without plottable-moment");
+            };
             Time.prototype._renderTierLabels = function (container, config, index) {
                 var _this = this;
                 var tickPos = this._getTickValuesForConfiguration(config);
@@ -4237,6 +4243,7 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
+                labelPos = this.formatTickLabels(labelPos);
                 var tickLabels = container.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) { return String(d.valueOf()); });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");

@@ -374,6 +374,15 @@ module Plottable.Axes {
       return tickPos;
     }
 
+    public formatTickLabels(labelPos: Date[]): any[] {
+      return labelPos;
+    }
+
+    public setTimeZone(timezone: string) {
+      Utils.Window.warn("timezone is not supported without plottable-moment");
+      return this;
+    }
+
     private _renderTierLabels(container: d3.Selection<void>, config: TimeAxisTierConfiguration, index: number) {
       let tickPos = this._getTickValuesForConfiguration(config);
       let labelPos: Date[] = [];
@@ -387,6 +396,7 @@ module Plottable.Axes {
       } else {
         labelPos = tickPos;
       }
+      labelPos = this.formatTickLabels(labelPos);
 
       let tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
       let tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);

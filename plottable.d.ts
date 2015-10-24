@@ -1989,6 +1989,8 @@ declare module Plottable.Axes {
         protected _getTickValues(): any[];
         private _cleanTiers();
         private _getTickValuesForConfiguration(config);
+        formatTickLabels(labelPos: Date[]): any;
+        setTimeZone(timezone: string): void;
         private _renderTierLabels(container, config, index);
         private _renderTickMarks(tickValues, index);
         private _renderLabellessTickMarks(tickValues);
