@@ -103,4 +103,14 @@ module Plottable.Utils.Math {
   export function degreesToRadians(degree: number) {
     return degree / 360 * nativeMath.PI * 2;
   }
+
+  export function valuesInDomain(values: number[], domain: number[]) {
+    let min = domain[0] <= domain[1] ? domain[0] : domain[1];
+      let max = domain[0] >= domain[1] ? domain[0] : domain[1];
+      if (min === domain[0]) {
+        return values.filter((i: number) => i >= min && i <= max);
+      } else {
+        return values.filter((i: number) => i >= min && i <= max).reverse();
+      }
+  }
 }

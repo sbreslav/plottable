@@ -8,7 +8,6 @@ module Plottable.Scales {
     private static _plottableColorCache: string[];
 
     private _d3Scale: d3.scale.Ordinal<string, string>;
-
     /**
      * A Color Scale maps string values to color hex values expressed as a string.
      *

@@ -1,6 +1,8 @@
 module Plottable.Scales {
   type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;
 
+  export type ColorTickGenerator = (scale: InterpolatedColor) => number[];
+
   export class InterpolatedColor extends Scale<number, string> {
     public static REDS = [
       "#FFFFFF", // white
@@ -47,6 +49,7 @@ module Plottable.Scales {
     private _colorScale: supportedScale;
     private _d3Scale: supportedScale;
 
+    private _tickGenerator: (scale: InterpolatedColor) => number[] = (scale: InterpolatedColor) => scale.domain();
     /**
      * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
      *
@@ -149,6 +152,35 @@ module Plottable.Scales {
     protected _setRange(range: string[]) {
       this._colorRange = range;
       this._resetScale();
+    }
+
+    /**
+    * Gets the TickGenerator.
+    */
+    public tickGenerator(): ColorTickGenerator;
+    /**
+    * Sets the TickGenerator
+    *
+    * @param {ColorTickGenerator} generator
+    * @return {InterpolatedColorScale} The calling InterpolatedColorScale
+    */
+    public tickGenerator(generator: ColorTickGenerator): number[];
+    public tickGenerator(generator?: ColorTickGenerator): any {
+      if (generator == null) {
+        return this._tickGenerator;
+      } else {
+        this._tickGenerator = generator;
+        return this;
+      }
+    }
+
+    /**
+    * Gets an array of tick values spanning the domain.
+    *
+    * @returns {number[]}
+    */
+    public ticks(): number[] {
+      return this._tickGenerator(this);
     }
   }
 }

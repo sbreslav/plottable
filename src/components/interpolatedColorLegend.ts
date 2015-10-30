@@ -303,6 +303,13 @@ module Plottable.Components {
 
       this._swatchBoundingBox.attr(boundingBoxAttr);
 
+      this._drawSwatches(numSwatches, swatchWidth, swatchHeight, swatchX, swatchY);
+
+      return this;
+    }
+
+    private _drawSwatches(numSwatches: number, swatchWidth: number, swatchHeight: number,
+                          swatchX: (d: any, i: number) => number, swatchY: (d: any, i: number) => number) {
       let ticks = this._generateTicks(numSwatches);
       let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
       let rects = swatches.enter().append("rect").classed("swatch", true);
@@ -318,8 +325,10 @@ module Plottable.Components {
       if (Configs.ADD_TITLE_ELEMENTS) {
         rects.append("title").text((d) => this._formatter(d));
       }
-      return this;
     }
 
+    protected _getTickValues() {
+      return Utils.Tick.getTickValues(this._scale);
+    }
   }
 }

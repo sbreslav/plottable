@@ -72,15 +72,7 @@ module Plottable.Axes {
     }
 
     protected _getTickValues() {
-      let scale = (<QuantitativeScale<number>> this._scale);
-      let domain = scale.domain();
-      let min = domain[0] <= domain[1] ? domain[0] : domain[1];
-      let max = domain[0] >= domain[1] ? domain[0] : domain[1];
-      if (min === domain[0]) {
-        return scale.ticks().filter((i: number) => i >= min && i <= max);
-      } else {
-        return scale.ticks().filter((i: number) => i >= min && i <= max).reverse();
-      }
+      return Utils.Tick.getTickValues(<QuantitativeScale<number>> this._scale);
     }
 
     protected _rescale() {
@@ -101,98 +93,23 @@ module Plottable.Axes {
 
     public renderImmediately() {
       super.renderImmediately();
-
-      let tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
-        x: <any> 0,
-        y: <any> 0,
-        dx: "0em",
-        dy: "0.3em"
-      };
-
       let tickMarkLength = this._maxLabelTickLength();
       let tickLabelPadding = this.tickLabelPadding();
-
-      let tickLabelTextAnchor = "middle";
-
-      let labelGroupTransformX = 0;
-      let labelGroupTransformY = 0;
-      let labelGroupShiftX = 0;
-      let labelGroupShiftY = 0;
-      if (this._isHorizontal()) {
-        switch (this._tickLabelPositioning) {
-          case "left":
-            tickLabelTextAnchor = "end";
-            labelGroupTransformX = -tickLabelPadding;
-            labelGroupShiftY = tickLabelPadding;
-            break;
-          case "center":
-            labelGroupShiftY = tickMarkLength + tickLabelPadding;
-            break;
-          case "right":
-            tickLabelTextAnchor = "start";
-            labelGroupTransformX = tickLabelPadding;
-            labelGroupShiftY = tickLabelPadding;
-            break;
-        }
-      } else {
-        switch (this._tickLabelPositioning) {
-          case "top":
-            tickLabelAttrHash["dy"] = "-0.3em";
-            labelGroupShiftX = tickLabelPadding;
-            labelGroupTransformY = -tickLabelPadding;
-            break;
-          case "center":
-            labelGroupShiftX = tickMarkLength + tickLabelPadding;
-            break;
-          case "bottom":
-            tickLabelAttrHash["dy"] = "1em";
-            labelGroupShiftX = tickLabelPadding;
-            labelGroupTransformY = tickLabelPadding;
-            break;
-        }
-      }
-
+      let tickLabelPositioning = this._tickLabelPositioning;
       let tickMarkAttrHash = this._generateTickMarkAttrHash();
-      switch (this.orientation()) {
-        case "bottom":
-          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
-          tickLabelAttrHash["dy"] = "0.95em";
-          labelGroupTransformY = <number> tickMarkAttrHash["y1"] + labelGroupShiftY;
-          break;
-
-        case "top":
-          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
-          tickLabelAttrHash["dy"] = "-.25em";
-          labelGroupTransformY = <number> tickMarkAttrHash["y1"] - labelGroupShiftY;
-          break;
-
-        case "left":
-          tickLabelTextAnchor = "end";
-          labelGroupTransformX = <number> tickMarkAttrHash["x1"] - labelGroupShiftX;
-          tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
-          break;
-
-        case "right":
-          tickLabelTextAnchor = "start";
-          labelGroupTransformX = <number> tickMarkAttrHash["x1"] + labelGroupShiftX;
-          tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
-          break;
-      }
-
+      let tickLabelAttributes = Utils.Tick.generateTicks(tickMarkAttrHash, tickMarkLength, this.orientation(), tickLabelPadding, tickLabelPositioning);
       let tickLabelValues = this._getTickValues();
-      let tickLabels = this._tickLabelContainer
-                           .selectAll("." + Axis.TICK_LABEL_CLASS)
-                           .data(tickLabelValues);
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
       tickLabels.enter().append("text").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
 
-      tickLabels.style("text-anchor", tickLabelTextAnchor)
+      tickLabels.style("text-anchor", tickLabelAttributes.tickLabelTextAnchor)
                 .style("visibility", "inherit")
-                .attr(tickLabelAttrHash)
+                .attr(tickLabelAttributes.tickLabelAttrHash)
                 .text((s: any) => this.formatter()(s));
 
-      let labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
-      this._tickLabelContainer.attr("transform", labelGroupTransform);
+
+      this._tickLabelContainer.attr("transform", tickLabelAttributes.labelGroupTransform);
 
       this._showAllTickMarks();
 
@@ -203,42 +120,24 @@ module Plottable.Axes {
       this._hideOverflowingTickLabels();
       this._hideOverlappingTickLabels();
 
-      if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top" ||
-          this._tickLabelPositioning === "left" ||
-          this._tickLabelPositioning === "right") {
+      if (this._tickLabelPositioning !== "center") {
         this._hideTickMarksWithoutLabel();
       }
       return this;
     }
 
     private _showAllTickMarks() {
-      this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS)
-                             .each(function() {
-                                     d3.select(this).style("visibility", "inherit");
-                                   });
+      Utils.Tick.showAllTickMarks(this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS));
     }
 
     /**
      * Hides the Tick Marks which have no corresponding Tick Labels
      */
     private _hideTickMarksWithoutLabel() {
-      let visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
-      let visibleTickLabels = this._tickLabelContainer
-                                  .selectAll("." + Axis.TICK_LABEL_CLASS)
-                                  .filter(function(d: any, i: number) {
-                                    let visibility = d3.select(this).style("visibility");
-                                    return (visibility === "inherit") || (visibility === "visible");
-                                  });
+      let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
 
-      let labelNumbersShown: number[] = [];
-      visibleTickLabels.each((labelNumber: number) => labelNumbersShown.push(labelNumber));
-
-      visibleTickMarks.each(function(e, i) {
-        if (labelNumbersShown.indexOf(e) === -1) {
-            d3.select(this).style("visibility", "hidden");
-        }
-      });
+      Utils.Tick.hideTickMarksWithoutLabel(tickMarks, tickLabels);
     }
 
     /**
@@ -303,91 +202,19 @@ module Plottable.Axes {
     private _hideEndTickLabels() {
       let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
       let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
-      if (tickLabels[0].length === 0) {
-        return;
-      }
-      let firstTickLabel = <Element> tickLabels[0][0];
-      if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
-        d3.select(firstTickLabel).style("visibility", "hidden");
-      }
-      let lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
-      if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
-        d3.select(lastTickLabel).style("visibility", "hidden");
-      }
+      Utils.Tick.hideEndTickLabels(tickLabels, boundingBox);
     }
 
     // Responsible for hiding any tick labels that break out of the bounding container
     private _hideOverflowingTickLabels() {
       let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
       let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
-      if (tickLabels.empty()) {
-        return;
-      }
-      tickLabels.each(function(d: any, i: number) {
-        if (!Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
-          d3.select(this).style("visibility", "hidden");
-        }
-      });
+      Utils.Tick.hideOverflowingTickLabels(tickLabels, boundingBox);
     }
 
     private _hideOverlappingTickLabels() {
-      let visibleTickLabels = this._tickLabelContainer
-                                    .selectAll("." + Axis.TICK_LABEL_CLASS)
-                                    .filter(function(d: any, i: number) {
-                                      let visibility = d3.select(this).style("visibility");
-                                      return (visibility === "inherit") || (visibility === "visible");
-                                    });
-
-      let visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
-      let interval = 1;
-
-      while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
-        interval += 1;
-      }
-
-      visibleTickLabels.each(function (d: string, i: number) {
-        let tickLabel = d3.select(this);
-        if (i % interval !== 0) {
-          tickLabel.style("visibility", "hidden");
-        }
-      });
-    }
-
-    /**
-     * The method is responsible for evenly spacing the labels on the axis.
-     * @return test to see if taking every `interval` recrangle from `rects`
-     *         will result in labels not overlapping
-     *
-     * For top, bottom, left, right positioning of the thicks, we want the padding
-     * between the labels to be 3x, such that the label will be  `padding` distance
-     * from the tick and 2 * `padding` distance (or more) from the next tick
-     *
-     */
-    private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
-
-      let padding = this.tickLabelPadding();
-
-      if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top" ||
-          this._tickLabelPositioning === "left" ||
-          this._tickLabelPositioning === "right" ) {
-        padding *= 3;
-      }
-
-      for (let i = 0; i < rects.length - (interval); i += interval) {
-        let currRect = rects[i];
-        let nextRect = rects[i + interval];
-        if (this._isHorizontal()) {
-          if (currRect.right + padding >= nextRect.left) {
-            return false;
-          }
-        } else {
-          if (currRect.top - padding <= nextRect.bottom) {
-            return false;
-          }
-        }
-      }
-      return true;
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
+      Utils.Tick.hideOverlappingTickLabels(tickLabels, this.orientation(), this._tickLabelPositioning, this.tickLabelPadding());
     }
 
   }

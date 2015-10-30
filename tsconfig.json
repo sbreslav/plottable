@@ -21,6 +21,7 @@
       "src/utils/stackingUtils.ts",
       "src/utils/windowUtils.ts",
       "src/utils/clientToSVGTranslator.ts",
+      "src/utils/tickUtils.ts",
 
       "src/core/config.ts",
       "src/core/version.ts",

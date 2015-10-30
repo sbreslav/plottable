@@ -489,45 +489,8 @@ export class Axis<D> extends Component {
   }
 
   protected _generateTickMarkAttrHash(isEndTickMark = false) {
-    let tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
-      x1: 0,
-      y1: 0,
-      x2: 0,
-      y2: 0
-    };
-
-    let scalingFunction = (d: any) => this._scale.scale(d);
-    if (this._isHorizontal()) {
-      tickMarkAttrHash["x1"] = scalingFunction;
-      tickMarkAttrHash["x2"] = scalingFunction;
-    } else {
-      tickMarkAttrHash["y1"] = scalingFunction;
-      tickMarkAttrHash["y2"] = scalingFunction;
-    }
-
     let tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
-
-    switch (this._orientation) {
-      case "bottom":
-        tickMarkAttrHash["y2"] = tickLength;
-        break;
-
-      case "top":
-        tickMarkAttrHash["y1"] = this.height();
-        tickMarkAttrHash["y2"] = this.height() - tickLength;
-        break;
-
-      case "left":
-        tickMarkAttrHash["x1"] = this.width();
-        tickMarkAttrHash["x2"] = this.width() - tickLength;
-        break;
-
-      case "right":
-        tickMarkAttrHash["x2"] = tickLength;
-        break;
-    }
-
-    return tickMarkAttrHash;
+    return Utils.Tick.generateTickMarkAttrHash(this._scale, this.width(), this.height(), this.orientation(), tickLength);
   }
 
   protected _setDefaultAlignment() {

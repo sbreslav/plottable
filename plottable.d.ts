@@ -52,6 +52,7 @@ declare module Plottable.Utils.Math {
      */
     function distanceSquared(p1: Point, p2: Point): number;
     function degreesToRadians(degree: number): number;
+    function valuesInDomain(values: number[], domain: number[]): number[];
 }
 declare module Plottable.Utils {
     /**
@@ -322,6 +323,43 @@ declare module Plottable.Utils {
          */
         insideSVG(e: Event): boolean;
     }
+}
+declare module Plottable.Utils.Tick {
+    type AttributeHash = {
+        [key: string]: number | string | ((d: any) => number);
+    };
+    function getTickValues(scale: QuantitativeScale<any> | Scales.InterpolatedColor): any[];
+    function generateTicks(tickMarkAttrHash: AttributeHash, tickMarkLength: number, orientation: string, tickLabelPadding: number, tickLabelPositioning: string): {
+        "tickMarkAttrHash": {
+            [key: string]: number | string | ((d: any) => number);
+        };
+        "tickLabelTextAnchor": string;
+        "tickLabelAttrHash": {
+            [key: string]: number | string | ((d: any) => number);
+        };
+        "labelGroupTransform": string;
+    };
+    function generateTickMarkAttrHash(scale: Plottable.Scale<any, any>, width: number, height: number, orientation: string, tickLength: number): {
+        [key: string]: number | string | ((d: any) => number);
+    };
+    /**
+     * Filters out visible selections
+     */
+    function visibleFilter(selection: d3.Selection<any>): d3.Selection<any>;
+    /**
+     *  Hides the Tick Marks which have no corresponding Tick Labels
+     */
+    function hideTickMarksWithoutLabel(tickMarks: d3.Selection<any>, tickLabels: d3.Selection<any>): void;
+    /**
+     *  Hides end ticks that are outside of boundingBox
+     */
+    function hideEndTickLabels(tickLabels: d3.Selection<any>, boundingBox: ClientRect): void;
+    /**
+     *  Hides ticks that are outside of boundingBox
+     */
+    function hideOverflowingTickLabels(tickLabels: d3.Selection<any>, boundingBox: ClientRect): void;
+    function hideOverlappingTickLabels(tickLabels: d3.Selection<any>, orientation: string, tickLabelPositioning: string, defaultPadding: number): void;
+    function showAllTickMarks(tickMarks: d3.Selection<any>): void;
 }
 declare module Plottable.Configs {
     /**
@@ -1145,6 +1183,7 @@ declare module Plottable.Scales {
     }
 }
 declare module Plottable.Scales {
+    type ColorTickGenerator = (scale: InterpolatedColor) => number[];
     class InterpolatedColor extends Scale<number, string> {
         static REDS: string[];
         static BLUES: string[];
@@ -1152,6 +1191,7 @@ declare module Plottable.Scales {
         private _colorRange;
         private _colorScale;
         private _d3Scale;
+        private _tickGenerator;
         /**
          * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
          *
@@ -1174,6 +1214,23 @@ declare module Plottable.Scales {
         protected _setBackingScaleDomain(values: number[]): void;
         protected _getRange(): string[];
         protected _setRange(range: string[]): void;
+        /**
+        * Gets the TickGenerator.
+        */
+        tickGenerator(): ColorTickGenerator;
+        /**
+        * Sets the TickGenerator
+        *
+        * @param {ColorTickGenerator} generator
+        * @return {InterpolatedColorScale} The calling InterpolatedColorScale
+        */
+        tickGenerator(generator: ColorTickGenerator): number[];
+        /**
+        * Gets an array of tick values spanning the domain.
+        *
+        * @returns {number[]}
+        */
+        ticks(): number[];
     }
 }
 declare module Plottable.Scales.TickGenerators {
@@ -1785,7 +1842,7 @@ declare module Plottable {
             [key: string]: number;
         };
         protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
-            [key: string]: number | ((d: any) => number);
+            [key: string]: number | string | ((d: any) => number);
         };
         protected _setDefaultAlignment(): void;
         /**
@@ -2019,7 +2076,7 @@ declare module Plottable.Axes {
         private _computeExactTextWidth();
         private _computeApproximateTextWidth();
         protected _computeHeight(): number;
-        protected _getTickValues(): number[];
+        protected _getTickValues(): any[];
         protected _rescale(): void;
         renderImmediately(): Numeric;
         private _showAllTickMarks();
@@ -2060,17 +2117,6 @@ declare module Plottable.Axes {
         private _hideEndTickLabels();
         private _hideOverflowingTickLabels();
         private _hideOverlappingTickLabels();
-        /**
-         * The method is responsible for evenly spacing the labels on the axis.
-         * @return test to see if taking every `interval` recrangle from `rects`
-         *         will result in labels not overlapping
-         *
-         * For top, bottom, left, right positioning of the thicks, we want the padding
-         * between the labels to be 3x, such that the label will be  `padding` distance
-         * from the tick and 2 * `padding` distance (or more) from the next tick
-         *
-         */
-        private _hasOverlapWithInterval(interval, rects);
     }
 }
 declare module Plottable.Axes {
@@ -2397,6 +2443,8 @@ declare module Plottable.Components {
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         private _isVertical();
         renderImmediately(): InterpolatedColorLegend;
+        private _drawSwatches(numSwatches, swatchWidth, swatchHeight, swatchX, swatchY);
+        protected _getTickValues(): any[];
     }
 }
 declare module Plottable.Components {
