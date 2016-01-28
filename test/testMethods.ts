@@ -48,6 +48,13 @@ module TestMethods {
     return d3.transform(element.attr("transform")).translate;
   }
 
+  export function assertDeepCloseTo(actual: number[], expected: number[], epsilon: number) {
+    assert.strictEqual(actual.length, expected.length, "array lengths equal");
+    actual.forEach((actualValue, i) => {
+      assert.closeTo(actualValue, expected[i], epsilon, `arrays differ at index ${i}`);
+    });
+  }
+
   export function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[], message: string) {
     let width = widthAndHeightPair[0];
     let height = widthAndHeightPair[1];

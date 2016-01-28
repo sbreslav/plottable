@@ -150,11 +150,8 @@ export class QuantitativeScale<D> extends Scale<D, number> {
         }
       });
     });
-    const originalDomain = this._getDomain();
-    this._setBackingScaleDomain(domain);
     let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-    this._setBackingScaleDomain(originalDomain);
 
     if (this._snappingDomainEnabled) {
       return this._niceDomain([newMin, newMax]);
@@ -256,13 +253,22 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     }
   }
 
-  protected _setDomain(values: D[]) {
+  private _validateDomain(values: D[]) {
     let isNaNOrInfinity = (x: any) => Utils.Math.isNaN(x) || x === Infinity || x === -Infinity;
     if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
       Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
-      return;
+      return false;
     }
-    super._setDomain(values);
+    if (values[0].valueOf() === values[1].valueOf()) {
+      return false;
+    }
+    return true
+  }
+
+  protected _setDomain(values: D[]) {
+    if (this._validateDomain(values)) {
+      super._setDomain(values);
+    }
   }
 
   /**

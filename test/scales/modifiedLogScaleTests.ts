@@ -123,7 +123,7 @@ describe("Scales", () => {
         scale.domain([0, 0]);
         scale.autoDomain();
 
-        assert.deepEqual(scale.domain(), originalAutoDomain, "autodomained as expected");
+        TestMethods.assertDeepCloseTo(scale.domain(), originalAutoDomain, 1e-9);
       });
 
       it("can force the minimum of the domain with domainMin()", () => {
