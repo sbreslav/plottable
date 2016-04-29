@@ -2,6 +2,7 @@ namespace Plottable.Scales {
   export class Category extends Scale<string, number> {
     private _d3Scale: d3.scale.Ordinal<string, number>;
     private _range = [0, 1];
+    private _comparator: (a: string, b: string) => number;
 
     private _innerPadding: number;
     private _outerPadding: number;
@@ -17,6 +18,7 @@ namespace Plottable.Scales {
       let d3InnerPadding = 0.3;
       this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+      this._comparator = (a: string, b: string) => 0;
     }
 
     public extentOfValues(values: string[]) {
@@ -24,7 +26,30 @@ namespace Plottable.Scales {
     }
 
     protected _getExtent(): string[] {
-      return Utils.Array.uniq(this._getAllIncludedValues());
+      return Utils.Array.uniq(this._getAllIncludedValues()).sort(this._comparator);
+    }
+
+    /**
+     * Gets the current comparator used to order the Scale's domain.
+     *
+     * @returns {(a: string, b: string) => number}
+     */
+    public comparator(): (a: string, b: string) => number;
+    /**
+     * Sets a new comparator used to order the Scale's domain.
+     *
+     * @param {(a: string, b: string) => number} comparator
+     * @returns {this}
+     */
+    public comparator(comparator: (a: string, b: string) => number): this;
+    public comparator(comparator?: (a: string, b: string) => number): any {
+      if (comparator == null) {
+        return this._comparator;
+      } else {
+        this._comparator = comparator;
+        this._dispatchUpdate();
+        return this;
+      }
     }
 
     public domain(): string[];

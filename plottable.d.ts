@@ -993,6 +993,7 @@ declare namespace Plottable.Scales {
     class Category extends Scale<string, number> {
         private _d3Scale;
         private _range;
+        private _comparator;
         private _innerPadding;
         private _outerPadding;
         /**
@@ -1003,6 +1004,19 @@ declare namespace Plottable.Scales {
         constructor();
         extentOfValues(values: string[]): string[];
         protected _getExtent(): string[];
+        /**
+         * Gets the current comparator used to order the Scale's domain.
+         *
+         * @returns {(a: string, b: string) => number}
+         */
+        comparator(): (a: string, b: string) => number;
+        /**
+         * Sets a new comparator used to order the Scale's domain.
+         *
+         * @param {(a: string, b: string) => number} comparator
+         * @returns {this}
+         */
+        comparator(comparator: (a: string, b: string) => number): this;
         domain(): string[];
         domain(values: string[]): this;
         range(): [number, number];

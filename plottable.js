@@ -20,11 +20,6 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
   }
 }(this, function (d3) {
 
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -204,7 +199,7 @@ var Plottable;
                 return false;
             };
             return Map;
-        }());
+        })();
         Utils.Map = Map;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -270,7 +265,7 @@ var Plottable;
                 });
             };
             return Set;
-        }());
+        })();
         Utils.Set = Set;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -621,6 +616,11 @@ var Plottable;
         })(Array = Utils.Array || (Utils.Array = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -647,7 +647,7 @@ var Plottable;
                 return this;
             };
             return CallbackSet;
-        }(Utils.Set));
+        })(Utils.Set);
         Utils.CallbackSet = CallbackSet;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -867,7 +867,7 @@ var Plottable;
             };
             ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
             return ClientToSVGTranslator;
-        }());
+        })();
         Utils.ClientToSVGTranslator = ClientToSVGTranslator;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -948,7 +948,7 @@ var Plottable;
             }
         };
         return Dataset;
-    }());
+    })();
     Plottable.Dataset = Dataset;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -966,7 +966,7 @@ var Plottable;
                 Plottable.RenderController.flush();
             };
             return Immediate;
-        }());
+        })();
         RenderPolicies.Immediate = Immediate;
         /**
          * The default way to render, which only tries to render every frame
@@ -979,7 +979,7 @@ var Plottable;
                 Plottable.Utils.DOM.requestAnimationFramePolyfill(Plottable.RenderController.flush);
             };
             return AnimationFrame;
-        }());
+        })();
         RenderPolicies.AnimationFrame = AnimationFrame;
         /**
          * Renders with `setTimeout()`.
@@ -994,7 +994,7 @@ var Plottable;
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
             };
             return Timeout;
-        }());
+        })();
         RenderPolicies.Timeout = Timeout;
     })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
@@ -1092,7 +1092,7 @@ var Plottable;
                 // Top level render; Containers will put their children in the toRender queue
                 _componentsNeedingRender.forEach(function (component) { return component.render(); });
                 _isCurrentlyFlushing = true;
-                var failed_1 = new Plottable.Utils.Set();
+                var failed = new Plottable.Utils.Set();
                 _componentsNeedingRender.forEach(function (component) {
                     try {
                         component.renderImmediately();
@@ -1100,11 +1100,11 @@ var Plottable;
                     catch (err) {
                         // throw error with timeout to avoid interrupting further renders
                         window.setTimeout(function () { throw err; }, 0);
-                        failed_1.add(component);
+                        failed.add(component);
                     }
                 });
                 _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                _componentsNeedingRender = failed_1;
+                _componentsNeedingRender = failed;
                 _animationRequested = false;
                 _isCurrentlyFlushing = false;
             }
@@ -1527,7 +1527,7 @@ var Plottable;
             return this;
         };
         return Scale;
-    }());
+    })();
     Plottable.Scale = Scale;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -1760,7 +1760,7 @@ var Plottable;
         };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
-    }(Plottable.Scale));
+    })(Plottable.Scale);
     Plottable.QuantitativeScale = QuantitativeScale;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -1816,7 +1816,7 @@ var Plottable;
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
             };
             return Linear;
-        }(Plottable.QuantitativeScale));
+        })(Plottable.QuantitativeScale);
         Scales.Linear = Linear;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2016,7 +2016,7 @@ var Plottable;
                 return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
             };
             return ModifiedLog;
-        }(Plottable.QuantitativeScale));
+        })(Plottable.QuantitativeScale);
         Scales.ModifiedLog = ModifiedLog;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2038,12 +2038,23 @@ var Plottable;
                 var d3InnerPadding = 0.3;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+                this._comparator = function (a, b) { return 0; };
             }
             Category.prototype.extentOfValues = function (values) {
                 return Plottable.Utils.Array.uniq(values);
             };
             Category.prototype._getExtent = function () {
-                return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
+                return Plottable.Utils.Array.uniq(this._getAllIncludedValues()).sort(this._comparator);
+            };
+            Category.prototype.comparator = function (comparator) {
+                if (comparator == null) {
+                    return this._comparator;
+                }
+                else {
+                    this._comparator = comparator;
+                    this._dispatchUpdate();
+                    return this;
+                }
             };
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
@@ -2123,7 +2134,7 @@ var Plottable;
                 this._setBands();
             };
             return Category;
-        }(Plottable.Scale));
+        })(Plottable.Scale);
         Scales.Category = Category;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2240,7 +2251,7 @@ var Plottable;
             // The maximum number of colors we are getting from CSS stylesheets
             Color._MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
-        }(Plottable.Scale));
+        })(Plottable.Scale);
         Scales.Color = Color;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2351,7 +2362,7 @@ var Plottable;
                 }
             };
             return Time;
-        }(Plottable.QuantitativeScale));
+        })(Plottable.QuantitativeScale);
         Scales.Time = Time;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2503,7 +2514,7 @@ var Plottable;
                 "#B10026",
             ];
             return InterpolatedColor;
-        }(Plottable.Scale));
+        })(Plottable.Scale);
         Scales.InterpolatedColor = InterpolatedColor;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2683,7 +2694,7 @@ var Plottable;
             return d3.select(this.selection()[0][index]);
         };
         return Drawer;
-    }());
+    })();
     Plottable.Drawer = Drawer;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -2705,7 +2716,7 @@ var Plottable;
                 return d3.select(this.selection()[0][0]);
             };
             return Line;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.Line = Line;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2728,7 +2739,7 @@ var Plottable;
                 return d3.select(this.selection()[0][0]);
             };
             return Area;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2743,7 +2754,7 @@ var Plottable;
                 this._svgElementName = "rect";
             }
             return Rectangle;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2763,7 +2774,7 @@ var Plottable;
                 selection.style("stroke", "none");
             };
             return Arc;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2783,7 +2794,7 @@ var Plottable;
                 selection.style("fill", "none");
             };
             return ArcOutline;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.ArcOutline = ArcOutline;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2799,7 +2810,7 @@ var Plottable;
                 this._className = "symbol";
             }
             return Symbol;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2814,7 +2825,7 @@ var Plottable;
                 this._svgElementName = "line";
             }
             return Segment;
-        }(Plottable.Drawer));
+        })(Plottable.Drawer);
         Drawers.Segment = Segment;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2831,7 +2842,7 @@ var Plottable;
             Alignment.RIGHT = "right";
             Alignment.CENTER = "center";
             return Alignment;
-        }());
+        })();
         Components.Alignment = Alignment;
     })(Components = Plottable.Components || (Plottable.Components = {}));
     var Component = (function () {
@@ -3063,7 +3074,7 @@ var Plottable;
         Component.prototype.renderTo = function (element) {
             this.detach();
             if (element != null) {
-                var selection = void 0;
+                var selection;
                 if (typeof (element) === "string") {
                     selection = d3.select(element);
                 }
@@ -3345,7 +3356,7 @@ var Plottable;
         };
         Component._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
         return Component;
-    }());
+    })();
     Plottable.Component = Component;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -3419,7 +3430,7 @@ var Plottable;
             this._forEach(function (c) { return c.destroy(); });
         };
         return ComponentContainer;
-    }(Plottable.Component));
+    })(Plottable.Component);
     Plottable.ComponentContainer = ComponentContainer;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -3509,7 +3520,7 @@ var Plottable;
                 return false;
             };
             return Group;
-        }(Plottable.ComponentContainer));
+        })(Plottable.ComponentContainer);
         Components.Group = Group;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -3550,7 +3561,7 @@ var Plottable;
                 return this;
             };
             return PlotGroup;
-        }(Components.Group));
+        })(Components.Group);
         Components.PlotGroup = PlotGroup;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -4097,7 +4108,7 @@ var Plottable;
         Axis.ANNOTATION_LABEL_CLASS = "annotation-label";
         Axis._ANNOTATION_LABEL_PADDING = 4;
         return Axis;
-    }(Plottable.Component));
+    })(Plottable.Component);
     Plottable.Axis = Axis;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -4571,7 +4582,7 @@ var Plottable;
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
             return Time;
-        }(Plottable.Axis));
+        })(Plottable.Axis);
         Axes.Time = Time;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
@@ -4899,7 +4910,7 @@ var Plottable;
                 return true;
             };
             return Numeric;
-        }(Plottable.Axis));
+        })(Plottable.Axis);
         Axes.Numeric = Numeric;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
@@ -5107,7 +5118,7 @@ var Plottable;
                 return this;
             };
             return Category;
-        }(Plottable.Axis));
+        })(Plottable.Axis);
         Axes.Category = Category;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
@@ -5226,7 +5237,7 @@ var Plottable;
                 return this;
             };
             return Label;
-        }(Plottable.Component));
+        })(Plottable.Component);
         Components.Label = Label;
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
@@ -5241,7 +5252,7 @@ var Plottable;
             }
             TitleLabel.TITLE_LABEL_CLASS = "title-label";
             return TitleLabel;
-        }(Label));
+        })(Label);
         Components.TitleLabel = TitleLabel;
         var AxisLabel = (function (_super) {
             __extends(AxisLabel, _super);
@@ -5256,7 +5267,7 @@ var Plottable;
             }
             AxisLabel.AXIS_LABEL_CLASS = "axis-label";
             return AxisLabel;
-        }(Label));
+        })(Label);
         Components.AxisLabel = AxisLabel;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -5532,7 +5543,7 @@ var Plottable;
              */
             Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
             return Legend;
-        }(Plottable.Component));
+        })(Plottable.Component);
         Components.Legend = Legend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -5701,9 +5712,9 @@ var Plottable;
                 var numSwatches;
                 if (this._isVertical()) {
                     numSwatches = Math.floor(this.height());
-                    var longestTextWidth_1 = Math.max(text0Width, text1Width);
-                    padding = (this.width() - longestTextWidth_1 - 2 * this._textPadding) / 2;
-                    swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth_1, 0);
+                    var longestTextWidth = Math.max(text0Width, text1Width);
+                    padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
+                    swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
                     swatchHeight = 1;
                     swatchY = function (d, i) { return _this.height() - (i + 1); };
                     upperWriteOptions.yAlign = "top";
@@ -5711,7 +5722,7 @@ var Plottable;
                     lowerWriteOptions.yAlign = "bottom";
                     lowerLabelShift.y = 0;
                     if (this._orientation === "left") {
-                        swatchX = function (d, i) { return textPadding + longestTextWidth_1 + textPadding; };
+                        swatchX = function (d, i) { return textPadding + longestTextWidth + textPadding; };
                         upperWriteOptions.xAlign = "right";
                         upperLabelShift.x = -(padding + swatchWidth + textPadding);
                         lowerWriteOptions.xAlign = "right";
@@ -5775,7 +5786,7 @@ var Plottable;
              */
             InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
             return InterpolatedColorLegend;
-        }(Plottable.Component));
+        })(Plottable.Component);
         Components.InterpolatedColorLegend = InterpolatedColorLegend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -5872,7 +5883,7 @@ var Plottable;
                 }
             };
             return Gridlines;
-        }(Plottable.Component));
+        })(Plottable.Component);
         Components.Gridlines = Gridlines;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -6257,7 +6268,7 @@ var Plottable;
                 return all(componentGroup.map(groupIsFixed));
             };
             return Table;
-        }(Plottable.ComponentContainer));
+        })(Plottable.ComponentContainer);
         Components.Table = Table;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -6474,7 +6485,7 @@ var Plottable;
                 }
             };
             return SelectionBoxLayer;
-        }(Plottable.Component));
+        })(Plottable.Component);
         Components.SelectionBoxLayer = SelectionBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -6618,7 +6629,7 @@ var Plottable;
             GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
             GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
             return GuideLineLayer;
-        }(Plottable.Component));
+        })(Plottable.Component);
         Components.GuideLineLayer = GuideLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -7075,7 +7086,7 @@ var Plottable;
         };
         Plot._ANIMATION_MAX_DURATION = 600;
         return Plot;
-    }(Plottable.Component));
+    })(Plottable.Component);
     Plottable.Plot = Plot;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -7396,7 +7407,7 @@ var Plottable;
             Pie._OUTER_RADIUS_KEY = "outer-radius";
             Pie._SECTOR_VALUE_KEY = "sector-value";
             return Pie;
-        }(Plottable.Plot));
+        })(Plottable.Plot);
         Plots.Pie = Pie;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -7542,12 +7553,12 @@ var Plottable;
         XYPlot.prototype._makeFilterByProperty = function (property) {
             var binding = this._propertyBindings.get(property);
             if (binding != null) {
-                var accessor_1 = binding.accessor;
-                var scale_1 = binding.scale;
-                if (scale_1 != null) {
+                var accessor = binding.accessor;
+                var scale = binding.scale;
+                if (scale != null) {
                     return function (datum, index, dataset) {
-                        var range = scale_1.range();
-                        return Plottable.Utils.Math.inRange(scale_1.scale(accessor_1(datum, index, dataset)), range[0], range[1]);
+                        var range = scale.range();
+                        return Plottable.Utils.Math.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
                     };
                 }
             }
@@ -7695,7 +7706,7 @@ var Plottable;
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
         return XYPlot;
-    }(Plottable.Plot));
+    })(Plottable.Plot);
     Plottable.XYPlot = XYPlot;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -7941,9 +7952,9 @@ var Plottable;
                     return scale.rangeBand();
                 }
                 else {
-                    var accessor_2 = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+                    var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
                     var accessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
-                        return dataset.data().map(function (d, i) { return accessor_2(d, i, dataset).valueOf(); });
+                        return dataset.data().map(function (d, i) { return accessor(d, i, dataset).valueOf(); });
                     }))).values().map(function (value) { return +value; });
                     // Get the absolute difference between min and max
                     var min = Plottable.Utils.Math.min(accessorData, 0);
@@ -8041,7 +8052,7 @@ var Plottable;
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
             return Rectangle;
-        }(Plottable.XYPlot));
+        })(Plottable.XYPlot);
         Plots.Rectangle = Rectangle;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -8093,8 +8104,8 @@ var Plottable;
                 var drawSteps = [];
                 if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    var symbolProjector_1 = Plottable.Plot._scaledAccessor(this.symbol());
-                    resetAttrToProjector["d"] = function (datum, index, dataset) { return symbolProjector_1(datum, index, dataset)(0); };
+                    var symbolProjector = Plottable.Plot._scaledAccessor(this.symbol());
+                    resetAttrToProjector["d"] = function (datum, index, dataset) { return symbolProjector(datum, index, dataset)(0); };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
@@ -8172,7 +8183,7 @@ var Plottable;
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
             return Scatter;
-        }(Plottable.XYPlot));
+        })(Plottable.XYPlot);
         Plots.Scatter = Scatter;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -8646,10 +8657,10 @@ var Plottable;
                 if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                    var scaledBaseline_1 = primaryScale.scale(this.baselineValue());
+                    var scaledBaseline = primaryScale.scale(this.baselineValue());
                     var positionAttr = this._isVertical ? "y" : "x";
                     var dimensionAttr = this._isVertical ? "height" : "width";
-                    resetAttrToProjector[positionAttr] = function () { return scaledBaseline_1; };
+                    resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
                     resetAttrToProjector[dimensionAttr] = function () { return 0; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
                 }
@@ -8701,9 +8712,9 @@ var Plottable;
                     barPixelWidth = barScale.rangeBand();
                 }
                 else {
-                    var barAccessor_1 = this._isVertical ? this.x().accessor : this.y().accessor;
+                    var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                     var numberBarAccessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
-                        return dataset.data().map(function (d, i) { return barAccessor_1(d, i, dataset); })
+                        return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset); })
                             .filter(function (d) { return d != null; })
                             .map(function (d) { return d.valueOf(); });
                     }))).values().map(function (value) { return +value; });
@@ -8774,7 +8785,7 @@ var Plottable;
             Bar._LABEL_VERTICAL_PADDING = 5;
             Bar._LABEL_HORIZONTAL_PADDING = 5;
             return Bar;
-        }(Plottable.XYPlot));
+        })(Plottable.XYPlot);
         Plots.Bar = Bar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -9171,7 +9182,7 @@ var Plottable;
                 return filteredIndices;
             };
             return Line;
-        }(Plottable.XYPlot));
+        })(Plottable.XYPlot);
         Plots.Line = Line;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -9339,7 +9350,7 @@ var Plottable;
             };
             Area._Y0_KEY = "y0";
             return Area;
-        }(Plots.Line));
+        })(Plots.Line);
         Plots.Area = Area;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -9397,7 +9408,7 @@ var Plottable;
                 return _super.prototype._getDataToDraw.call(this);
             };
             return ClusteredBar;
-        }(Plots.Bar));
+        })(Plots.Bar);
         Plots.ClusteredBar = ClusteredBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -9575,7 +9586,7 @@ var Plottable;
                 return { x: pixelPoint.x, y: scaledYValue };
             };
             return StackedArea;
-        }(Plots.Area));
+        })(Plots.Area);
         Plots.StackedArea = StackedArea;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -9690,7 +9701,7 @@ var Plottable;
                 this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             return StackedBar;
-        }(Plots.Bar));
+        })(Plots.Bar);
         Plots.StackedBar = StackedBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -9862,7 +9873,7 @@ var Plottable;
             Segment._X2_KEY = "x2";
             Segment._Y2_KEY = "y2";
             return Segment;
-        }(Plottable.XYPlot));
+        })(Plottable.XYPlot);
         Plots.Segment = Segment;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -10059,7 +10070,7 @@ var Plottable;
             Waterfall._CONNECTOR_AREA_CLASS = "connector-area";
             Waterfall._TOTAL_KEY = "total";
             return Waterfall;
-        }(Plots.Bar));
+        })(Plots.Bar);
         Plots.Waterfall = Waterfall;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -10081,7 +10092,7 @@ var Plottable;
                 return selection.attr(attrToAppliedProjector);
             };
             return Null;
-        }());
+        })();
         Animators.Null = Null;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
@@ -10194,7 +10205,7 @@ var Plottable;
              */
             Easing._DEFAULT_EASING_MODE = "exp-out";
             return Easing;
-        }());
+        })();
         Animators.Easing = Easing;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
@@ -10260,7 +10271,7 @@ var Plottable;
             }
         };
         return Dispatcher;
-    }());
+    })();
     Plottable.Dispatcher = Dispatcher;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -10446,7 +10457,7 @@ var Plottable;
             Mouse._WHEEL_EVENT_NAME = "wheel";
             Mouse._DBLCLICK_EVENT_NAME = "dblclick";
             return Mouse;
-        }(Plottable.Dispatcher));
+        })(Plottable.Dispatcher);
         Dispatchers.Mouse = Mouse;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
@@ -10609,7 +10620,7 @@ var Plottable;
             Touch._TOUCHEND_EVENT_NAME = "touchend";
             Touch._TOUCHCANCEL_EVENT_NAME = "touchcancel";
             return Touch;
-        }(Plottable.Dispatcher));
+        })(Plottable.Dispatcher);
         Dispatchers.Touch = Touch;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
@@ -10693,7 +10704,7 @@ var Plottable;
             Key._KEYDOWN_EVENT_NAME = "keydown";
             Key._KEYUP_EVENT_NAME = "keyup";
             return Key;
-        }(Plottable.Dispatcher));
+        })(Plottable.Dispatcher);
         Dispatchers.Key = Key;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
@@ -10787,7 +10798,7 @@ var Plottable;
                 && p.y <= this._componentAttachedTo.height();
         };
         return Interaction;
-    }());
+    })();
     Plottable.Interaction = Interaction;
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -10861,7 +10872,7 @@ var Plottable;
                 return this;
             };
             return Click;
-        }(Plottable.Interaction));
+        })(Plottable.Interaction);
         Interactions.Click = Click;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -10967,7 +10978,7 @@ var Plottable;
                 return this;
             };
             return DoubleClick;
-        }(Plottable.Interaction));
+        })(Plottable.Interaction);
         Interactions.DoubleClick = DoubleClick;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -11079,7 +11090,7 @@ var Plottable;
                 return this;
             };
             return Key;
-        }(Plottable.Interaction));
+        })(Plottable.Interaction);
         Interactions.Key = Key;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -11196,7 +11207,7 @@ var Plottable;
                 return this;
             };
             return Pointer;
-        }(Plottable.Interaction));
+        })(Plottable.Interaction);
         Interactions.Pointer = Pointer;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -11350,18 +11361,18 @@ var Plottable;
                 if (this._isInsideComponent(translatedP)) {
                     e.preventDefault();
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
-                    var zoomAmount_1 = Math.pow(2, deltaPixelAmount * .002);
+                    var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     this.xScales().forEach(function (xScale) {
-                        zoomAmount_1 = _this._constrainedZoomAmount(xScale, zoomAmount_1);
+                        zoomAmount = _this._constrainedZoomAmount(xScale, zoomAmount);
                     });
                     this.yScales().forEach(function (yScale) {
-                        zoomAmount_1 = _this._constrainedZoomAmount(yScale, zoomAmount_1);
+                        zoomAmount = _this._constrainedZoomAmount(yScale, zoomAmount);
                     });
                     this.xScales().forEach(function (xScale) {
-                        _this._magnifyScale(xScale, zoomAmount_1, translatedP.x);
+                        _this._magnifyScale(xScale, zoomAmount, translatedP.x);
                     });
                     this.yScales().forEach(function (yScale) {
-                        _this._magnifyScale(yScale, zoomAmount_1, translatedP.y);
+                        _this._magnifyScale(yScale, zoomAmount, translatedP.y);
                     });
                 }
             };
@@ -11403,11 +11414,11 @@ var Plottable;
             PanZoom.prototype.xScales = function (xScales) {
                 var _this = this;
                 if (xScales == null) {
-                    var scales_1 = [];
+                    var scales = [];
                     this._xScales.forEach(function (xScale) {
-                        scales_1.push(xScale);
+                        scales.push(xScale);
                     });
-                    return scales_1;
+                    return scales;
                 }
                 this._xScales = new Plottable.Utils.Set();
                 xScales.forEach(function (xScale) {
@@ -11418,11 +11429,11 @@ var Plottable;
             PanZoom.prototype.yScales = function (yScales) {
                 var _this = this;
                 if (yScales == null) {
-                    var scales_2 = [];
+                    var scales = [];
                     this._yScales.forEach(function (yScale) {
-                        scales_2.push(yScale);
+                        scales.push(yScale);
                     });
-                    return scales_2;
+                    return scales;
                 }
                 this._yScales = new Plottable.Utils.Set();
                 yScales.forEach(function (yScale) {
@@ -11513,7 +11524,7 @@ var Plottable;
              */
             PanZoom._PIXELS_PER_LINE = 120;
             return PanZoom;
-        }(Plottable.Interaction));
+        })(Plottable.Interaction);
         Interactions.PanZoom = PanZoom;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -11664,7 +11675,7 @@ var Plottable;
                 return this;
             };
             return Drag;
-        }(Plottable.Interaction));
+        })(Plottable.Interaction);
         Interactions.Drag = Drag;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -12032,7 +12043,7 @@ var Plottable;
                 });
             };
             return DragBoxLayer;
-        }(Components.SelectionBoxLayer));
+        })(Components.SelectionBoxLayer);
         Components.DragBoxLayer = DragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -12086,7 +12097,7 @@ var Plottable;
                 throw new Error("XDragBoxLayer has no yExtent");
             };
             return XDragBoxLayer;
-        }(Components.DragBoxLayer));
+        })(Components.DragBoxLayer);
         Components.XDragBoxLayer = XDragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -12140,7 +12151,7 @@ var Plottable;
                 throw new Error("YDragBoxLayer has no xExtent");
             };
             return YDragBoxLayer;
-        }(Components.DragBoxLayer));
+        })(Components.DragBoxLayer);
         Components.YDragBoxLayer = YDragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -12319,7 +12330,7 @@ var Plottable;
                 this._disconnectInteraction();
             };
             return DragLineLayer;
-        }(Components.GuideLineLayer));
+        })(Components.GuideLineLayer);
         Components.DragLineLayer = DragLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
