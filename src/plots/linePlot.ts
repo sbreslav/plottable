@@ -411,6 +411,19 @@ namespace Plottable.Plots {
       return dataToDraw;
     }
 
+    private _line_intersects(x1: number, y1: number, x2: number, y2: number,
+                            x3: number, y3: number, x4: number, y4: number) {
+        // Adapted from: http://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
+
+        let aDx = x2 - x1;
+        let aDy = y2 - y1;
+        let bDx = x4 - x3;
+        let bDy = y4 - y3;
+        let s = (-aDy * (x1 - x3) + aDx * (y1 - y3)) / (-bDx * aDy + aDx * bDy);
+        let t = (bDx * (y1 - y3) - bDy * (x1 - x3)) / (-bDx * aDy + aDx * bDy);
+        return (s >= 0 && s <= 1 && t >= 0 && t <= 1);
+    }
+
     private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
       let xProjector = Plot._scaledAccessor(this.x());
       let yProjector = Plot._scaledAccessor(this.y());
@@ -422,6 +435,13 @@ namespace Plottable.Plots {
           Utils.Math.inRange(y, 0, this.height());
       };
 
+      let crossesViewport = (x0: number, y0: number, x1: number, y1: number) => {
+        return this._line_intersects(x0, y0, x1, y1, 0, 0, this.width(), 0) ||
+               this._line_intersects(x0, y0, x1, y1, this.width(), 0, this.width(), this.height()) ||
+               this._line_intersects(x0, y0, x1, y1, 0, this.height(), this.width(), this.height()) ||
+               this._line_intersects(x0, y0, x1, y1, 0, 0, 0, this.height());
+      };
+
       for (let i = 0; i < indices.length; i++) {
         let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
         let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
@@ -430,13 +450,15 @@ namespace Plottable.Plots {
         if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
           let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
           let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
-          shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
+          shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint) ||
+                       crossesViewport(currXPoint, currYPoint, prevXPoint, prevYPoint);
         }
 
         if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
           let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
           let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
-          shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
+          shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint) ||
+                       crossesViewport(currXPoint, currYPoint, nextXPoint, nextYPoint);
         }
 
         if (shouldShow) {
